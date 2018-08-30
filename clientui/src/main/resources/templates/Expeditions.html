@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Mcommerce</title>
+
+    <link rel="stylesheet" type="text/css"
+          href="http://localhost:8080/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css"/>
+</head>
+
+<body>
+<div class="container">
+
+    <h1 class="text-center">Application Mcommerce</h1>
+
+    <div class="col-md-4 mx-auto mt-5 text-center">
+        <p>
+            Commande N°: <span style="font-weight: bold" th:text="${commandeSuivi.idCommande}"></span>
+            <br>
+            État de la commande :
+            <br>
+            <span style="color:goldenrod;font-weight: bold" th:if="${commandeSuivi.etat == 0}"> En préparation </span>
+            <span style="color:green;font-weight: bold" th:if="${commandeSuivi.etat == 1}"> Expédiée </span>
+            <span style="color:darkgreen;font-weight: bold" th:if="${commandeSuivi.etat == 2}"> Livrée </span>
+        </p>
+        <br>
+    </div>
+    <div style="margin: auto">
+        <table class="table table-striped">
+            <tr>
+                <th>Date de commande</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix</th>
+                <th>Etat du paiment</th>
+            </tr>
+            <tr>
+                <th th:text="${#dates.format(commande.dateCommande, 'dd-MMM-yyyy')}"></th>
+                <th th:text="${produits.titre}"></th>
+                <th th:text="${commande.quantite}"></th>
+                <th th:text="${produits.prix}"></th>
+                <th>
+                    <span th:if="${commande.commandePayee}" style="color:green">Payé</span>
+                    <span th:unless="${commande.commandePayee}" style="color:red">Paiment en attente</span>
+                </th>
+            </tr>
+        </table>
+    </div>
+    <a th:href="@{|/|}" class="font-weight-bold text-center">retour a l'acceuil</a>
+</div>
+
+
+<script type="text/javascript" src="http://localhost:8080/webjars/bootstrap/4.0.0-2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

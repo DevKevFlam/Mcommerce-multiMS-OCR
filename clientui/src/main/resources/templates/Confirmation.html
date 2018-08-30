@@ -17,17 +17,24 @@
     <div class="row">
         <div class="col-md-4 mx-auto mt-5 text-center">
 
-            <p th:if="${paiementOk}" >
-                Paiement Accepté
+            <p th:if="${paiementOk}">
+
+            <p>Paiement Accepté</p>
+
+            <a th:href="@{|/suivi/${idCommande}|}" class="font-weight-bold">Suivre ma commande <br></a>
+            <br>
+            <a th:href="@{|/|}" class="font-weight-bold">retour a l'acceuil<br></a>
             </p>
 
             <p th:unless="${paiementOk}">
                 Le paiement n'a pas abouti
+
+                <a th:href="@{|/|}" class="font-weight-bold">retour a l'acceuil</a>
             </p>
 
 
-
         </div>
+
     </div>
 
 </div>

@@ -1,16 +1,16 @@
-package com.mcommandes;
+package com.mexpedition;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
+@EnableFeignClients
 @EnableDiscoveryClient
-@EnableConfigurationProperties
-public class McommandesApplication {
+public class MExpeditionApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(McommandesApplication.class, args);
+		SpringApplication.run(MExpeditionApplication.class, args);
 	}
 }

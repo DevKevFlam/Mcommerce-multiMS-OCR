@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class ProductController implements HealthIndicator {
+public class /**/ProductController implements HealthIndicator {
 
     @Autowired
     ProductDao productDao;

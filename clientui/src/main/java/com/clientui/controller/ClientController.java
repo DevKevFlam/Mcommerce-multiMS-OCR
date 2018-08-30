@@ -1,9 +1,11 @@
 package com.clientui.controller;
 
 import com.clientui.beans.CommandeBean;
+import com.clientui.beans.ExpeditionBean;
 import com.clientui.beans.PaiementBean;
 import com.clientui.beans.ProductBean;
 import com.clientui.proxies.MicroserviceCommandeProxy;
+import com.clientui.proxies.MicroserviceExpeditionProxy;
 import com.clientui.proxies.MicroservicePaiementProxy;
 import com.clientui.proxies.MicroserviceProduitsProxy;
 import org.slf4j.Logger;
@@ -15,12 +17,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-
 
 @Controller
 public class ClientController {
@@ -34,6 +33,8 @@ public class ClientController {
     @Autowired
     private MicroservicePaiementProxy paiementProxy;
 
+    @Autowired
+    private MicroserviceExpeditionProxy expeditionProxy;
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -47,7 +48,7 @@ public class ClientController {
     public String accueil(Model model){
 
 
-        log.info("Envoi requête vers microservice-produits");
+        log.info("Envoi requête LISTE PRODUIT");
 
         List<ProductBean> produits =  ProduitsProxy.listeDesProduits();
 
@@ -65,6 +66,8 @@ public class ClientController {
     @RequestMapping("/details-produit/{id}")
     public String ficheProduit(@PathVariable int id,  Model model){
 
+        log.info("Envoi requête FICHE PRODUIT");
+
         ProductBean produit = ProduitsProxy.recupererUnProduit(id);
 
         model.addAttribute("produit", produit);
@@ -79,6 +82,7 @@ public class ClientController {
     @RequestMapping(value = "/commander-produit/{idProduit}/{montant}")
     public String passerCommande(@PathVariable int idProduit, @PathVariable Double montant,  Model model){
 
+        log.info("Envoi requête COMMANDE");
 
         CommandeBean commande = new CommandeBean();
 
@@ -104,6 +108,8 @@ public class ClientController {
     @RequestMapping(value = "/payer-commande/{idCommande}/{montantCommande}")
     public String payerCommande(@PathVariable int idCommande, @PathVariable Double montantCommande, Model model){
 
+        log.info("Envoi requête PAYER");
+
         PaiementBean paiementAExcecuter = new PaiementBean();
 
         //on reseigne les détails du produit
@@ -116,11 +122,19 @@ public class ClientController {
 
         Boolean paiementAccepte = false;
         //si le code est autre que 201 CREATED, c'est que le paiement n'a pas pu aboutir.
-        if(paiement.getStatusCode() == HttpStatus.CREATED)
-                paiementAccepte = true;
+        if(paiement.getStatusCode() == HttpStatus.CREATED){ paiementAccepte = true;
+        }
+
+        log.info("Envoi requête vers microservice-EXP");
+        ExpeditionBean expedition = new ExpeditionBean();
+        expedition.setId(0);
+        expedition.setEtat(1);
+        expedition.setIdCommande(idCommande);
+        expeditionProxy.ajouterExpedition(expedition);
+
 
         model.addAttribute("paiementOk", paiementAccepte); // on envoi un Boolean paiementOk à la vue
-
+        model.addAttribute("idCommande", paiementAExcecuter.getIdCommande());
         return "confirmation";
     }
 
@@ -128,5 +142,28 @@ public class ClientController {
     private Long numcarte() {
 
         return ThreadLocalRandom.current().nextLong(1000000000000000L,9000000000000000L );
+    }
+
+
+    @RequestMapping(value = "/suivi/{idCommande}")
+    public String suivreCommande(@PathVariable int idCommande, Model model){
+
+        log.info("Envoi requête SUIVI");
+
+        Optional<ExpeditionBean> commandeRecup =  expeditionProxy.etatExpedition(idCommande);
+
+        ExpeditionBean commandeASuivre = commandeRecup.get() ;
+
+        //Récupération des info commande
+        CommandeBean commande = CommandesProxy.recupererUneCommande(idCommande);
+
+        //Récupération des info produit de la commande
+        ProductBean produit = ProduitsProxy.recupererUnProduit(commande.getProductId());
+
+        model.addAttribute("commandeSuivi", commandeASuivre);
+        model.addAttribute("commande", commande);
+        model.addAttribute("produits", produit);
+
+        return "Expeditions";
     }
 }
