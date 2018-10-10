@@ -1,3 +1,7 @@
+# Mcommerce-multiMS-OCR
+
+Activité du tuto "Optimisez votre architecture Microservices" de OpenClassRoom  
+
 #Ordre de lancement des services:  
 1.config-server  
 2.eureka-server  
